@@ -120,7 +120,13 @@ int main(int argc, char   *argv[ ])
 	if (!buf) 
 		return 1;
 	/* If IBV_ACCESS_REMOTE_WRITE is set, then IBV_ACCESS_LOCAL_WRITE must be set too since remote write should be allowed only if local write is allowed*/
-	/* Question: why a RDMA_READ operation require IBV_ACCESS_REMOTE_WRITE attribute ?*/
+	/* Question: why a RDMA_READ operation require IBV_ACCESS_REMOTE_WRITE attribute ?
+	 * Answer: see  https://tools.ietf.org/html/draft-hilland-rddp-verbs-00#page-88
+	 *  "The RI MUST enforce that Tagged Buffers consumed by RDMA Read
+	 *   Response Messages have Remote Write Access enabled or an
+	 *   Asynchronous Error will result at the Data Sink."
+	 */
+
 	mr = ibv_reg_mr(pd, buf,2 * sizeof(uint32_t), IBV_ACCESS_LOCAL_WRITE|IBV_ACCESS_REMOTE_WRITE); 
 	if (!mr) 
 		return 1;
